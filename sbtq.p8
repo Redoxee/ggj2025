@@ -13,6 +13,18 @@ g_bubbles = {}
 
 c_state_title=1
 c_state_game=2
+c_state_text=3
+
+c_levels={
+    {
+        triggers={
+            {x=30,y=64,w=16,h=8},
+            {x=98,y=64,w=16,h=8},
+        }
+    }
+}
+
+g_leveli=1
 
 g_state=c_state_title
 
@@ -90,6 +102,7 @@ function _update60()
         if btn(4) then 
             bbl(64, 126, 0, 0, g_buoy, 5)
         end
+    elseif g_state==c_state_text then
         updatetete()
     end
 end
@@ -101,7 +114,8 @@ function _draw()
         print("\^w\^tshitty bubble\n  toy quest",16,16,7)
         print("by @marechalbanane,\n   @antonmakesgames,\n   @jirolondon",30,90,7)
     elseif g_state==c_state_game then
-        map()
+        local mapi=g_leveli-1
+        map(mapi*16,mapi\8)
 
         for index=1,#g_bubbles do
             bulle = g_bubbles[index]
@@ -109,6 +123,16 @@ function _draw()
         end
 
         line(0,g_sea_level, 127, g_sea_level, 7)
+
+        -- triggers
+        local triggers=c_levels[g_leveli].triggers
+        if triggers then
+            for trigger in all(triggers) do
+                local x,y,hw,hh=trigger.x,trigger.y,trigger.w/2,trigger.h/2
+                rect(x-hw,y-hh,x+hw,y+hh,11)
+            end
+        end
+    elseif g_state==c_state_text then
         drawtete()
     end
 end
