@@ -1,0 +1,115 @@
+--Terribly Excellent Text Engine, v0.0.0.0.0.1a.0
+
+--global variables
+g_storytree={
+
+	start={
+----------------------------
+		text=[[
+il est deja 9 heures.]],
+		choices={
+					{"se lever","lever"},
+					{"rester au lit","start2"},
+				}
+	},
+	
+	start2={
+----------------------------
+		text=[[
+il est deja 9 heures et
+quelques.]],
+		choices={
+					{"se lever","lever"},
+					{"rester au lit","start2"},
+				}
+	},
+
+	lever={
+----------------------------
+		text=[[
+il fait moins chaud que dans
+le lit.]],
+		label="lever2"
+	},
+
+	lever2={
+
+		text=[[
+la porte est ouverte.]],
+		choices={
+					{"sortir","sortie"},
+					{"retourner au lit","start2"},
+				}
+	},
+
+	sortie={
+----------------------------
+		text=[[
+dehors le monde existe un
+peu trop.]],
+		label="fin"
+	},
+
+	fin={
+----------------------------
+		text=[[
+vous ne serez jamais star de
+cinema.]],
+		choices={
+					{"recommencer","start"}
+				}
+	},
+}
+
+c_charticks=3
+
+g_node=g_storytree["start"]
+g_choicei=1
+g_tick=0
+g_chari=1
+
+function textfinished() return g_chari==#g_node.text end
+function updatetete()
+	g_tick+=1
+	if g_tick==c_charticks then
+		g_chari=min(g_chari+1,#g_node.text)
+		g_tick=0
+	end
+	if btnp(0) then
+		g_choicei-=1
+		if (g_choicei==0)g_choicei=#g_node.choices
+	elseif btnp(1) then
+		g_choicei+=1
+		if (g_choicei==#g_node.choices+1)g_choicei=1
+	elseif btnp(4) and textfinished() then
+		-- validate choice
+		local label=g_node.label or g_node.choices[g_choicei][2] 
+		g_node=g_storytree[label]
+		g_choicei=1
+		g_chari=1
+	elseif btnp(5) then
+		--pass text
+		g_chari=#g_node.text
+	end 
+end
+
+function drawtete()
+	local txty=8
+	print(sub(g_node.text,1,g_chari),8,txty,7)
+	if textfinished() then
+	 	if g_node.choices then
+			local cnt=#g_node.choices
+			for i=1,cnt do
+				local choice=g_node.choices[i]
+				local offset=(i-1)*50/max(1,cnt-1)
+				print(choice[1],9+offset,110,7)
+				if i==g_choicei then
+					circfill(4+offset,112.5+cos(t()),2,7)
+				end
+			end
+		elseif g_node.label then
+			local numlines=#split(g_node.text,"\n")
+			circfill(62,txty+2.5+numlines*6+cos(t()),2,7)
+		end
+	end
+end
