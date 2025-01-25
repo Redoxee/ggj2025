@@ -11,6 +11,11 @@ g_repell = .025
 
 g_bubbles = {}
 
+c_state_title=1
+c_state_game=2
+
+g_state=c_state_title
+
 function bbl(x, y, dx, dy, buoy, r)
     bulle = {
         x = x,
@@ -36,65 +41,76 @@ bbl(64, 32, 0, 0, 0, 10)
 bbl(64, 02, 0, 0, -.02, 1)
 
 function _update60()
-    for index=1,#g_bubbles do
-        o1 = g_bubbles[index]
-        for jndex=1,#g_bubbles do
-            if index == jndex then
-                goto continue
-            end
-
-            o2 = g_bubbles[jndex]
-            sq = dist_sq(o1, o2)
-            sq_sum = o1.radius_sq + o2.radius_sq 
-            if sq > sq_sum then
-                goto continue
-            end
-            
-            f = g_repell 
-
-            o1.dx -= (o2.x - o1.x) * f
-            o1.dy += (o2.y - o1.y) * f
-
-            ::continue::
+    if g_state==c_state_title then
+        if btnp(4) or btnp(5) then
+            g_state=c_state_game
         end
-    end
+    elseif g_state==c_state_game then
+        for index=1,#g_bubbles do
+            o1 = g_bubbles[index]
+            for jndex=1,#g_bubbles do
+                if index == jndex then
+                    goto continue
+                end
 
-    for index=1,#g_bubbles do
-        bulle = g_bubbles[index]
-        bulle.x += bulle.dx
-        bulle.y -= bulle.dy
-        bulle.dy += bulle.buoy
-        bulle.dx *= g_drag
-        bulle.dy *= g_drag
-    end
+                o2 = g_bubbles[jndex]
+                sq = dist_sq(o1, o2)
+                sq_sum = o1.radius_sq + o2.radius_sq 
+                if sq > sq_sum then
+                    goto continue
+                end
+                
+                f = g_repell 
 
+                o1.dx -= (o2.x - o1.x) * f
+                o1.dy += (o2.y - o1.y) * f
 
-    for index = #g_bubbles, 1, -1 do
-        if g_bubbles[index].y < g_sea_level then
-            deli(g_bubbles, index)
-        elseif g_bubbles[index].y > 128 + 15 then
-            deli(g_bubbles, index)
+                ::continue::
+            end
         end
-    end
 
-    if btn(4) then 
-        bbl(64, 126, 0, 0, g_buoy, 5)
+        for index=1,#g_bubbles do
+            bulle = g_bubbles[index]
+            bulle.x += bulle.dx
+            bulle.y -= bulle.dy
+            bulle.dy += bulle.buoy
+            bulle.dx *= g_drag
+            bulle.dy *= g_drag
+        end
+
+
+        for index = #g_bubbles, 1, -1 do
+            if g_bubbles[index].y < g_sea_level then
+                deli(g_bubbles, index)
+            elseif g_bubbles[index].y > 128 + 15 then
+                deli(g_bubbles, index)
+            end
+        end
+
+        if btn(4) then 
+            bbl(64, 126, 0, 0, g_buoy, 5)
+        end
+        updatetete()
     end
-    updatetete()
 end
 
 function _draw()
     cls(1)
 
-    map()
+    if g_state==c_state_title then
+        print("\^w\^tshitty bubble\n  toy quest",16,16,7)
+        print("by @marechalbanane,\n   @antonmakesgames,\n   @jirolondon",30,90,7)
+    elseif g_state==c_state_game then
+        map()
 
-    for index=1,#g_bubbles do
-        bulle = g_bubbles[index]
-        circ(bulle.x, bulle.y, bulle.radius, 7)
+        for index=1,#g_bubbles do
+            bulle = g_bubbles[index]
+            circ(bulle.x, bulle.y, bulle.radius, 7)
+        end
+
+        line(0,g_sea_level, 127, g_sea_level, 7)
+        drawtete()
     end
-
-    line(0,g_sea_level, 127, g_sea_level, 7)
-    drawtete()
 end
 
 __gfx__
