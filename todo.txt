@@ -1,0 +1,10 @@
+TODO SBTQ:
+===
+
+- faire le buller (Anton, en cours)
+- implémenter collision bulles
+- implémenter collision donut
+- trigger fin de niveau
+- flow de passage de niveau
+- passe d'UI
+- écran titre
